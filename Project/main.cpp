@@ -183,22 +183,22 @@ void DeleteOp(int choiceTable)
 {
 	ret = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt); // 申请句柄 
 	string str1 = "use student";
-    wstring wstr1 = StringToWString(str1);
+	wstring wstr1 = StringToWString(str1);
 	ret = SQLExecDirectW(hstmt, (SQLWCHAR*)wstr1.c_str(), SQL_NTS);
 
-    switch (choiceTable) {
+	switch (choiceTable) {
 	case 1:
 	{
 		string sql = "delete from Student where [sno-学号]=";
 		string Sno;
 		cout << "请输入要删除的学生学号" << endl;
-        cin >> Sno;
+		cin >> Sno;
 		sql = sql + "'" + Sno + "'";
 		wstring wsql = StringToWString(sql);
 
 		ret = SQLExecDirectW(hstmt, (SQLWCHAR*)wsql.c_str(), SQL_NTS);
 		if (ret == SQL_SUCCESS || ret == SQL_SUCCESS_WITH_INFO) {
-            cout << "学生信息删除成功！" << endl;
+			cout << "学生信息删除成功！" << endl;
 		}
 		else {
 			cout << "学生信息删除失败！" << endl;
@@ -290,7 +290,7 @@ void QueryOp(int choiceTable)
 		wstring wsql = StringToWString(sql);
 		ret = SQLExecDirectW(hstmt, (SQLWCHAR*)wsql.c_str(), SQL_NTS);
 
-		if (ret == SQL_SUCCESS || ret == SQL_SUCCESS_WITH_INFO) 
+		if (ret == SQL_SUCCESS || ret == SQL_SUCCESS_WITH_INFO)
 		{
 			cout << "查询课程信息结果如下：" << endl;
 			SQLCHAR str1[50], str2[50], str3[50];
@@ -315,7 +315,7 @@ void QueryOp(int choiceTable)
 		wstring wsql = StringToWString(sql);
 		ret = SQLExecDirectW(hstmt, (SQLWCHAR*)wsql.c_str(), SQL_NTS);
 
-		if (ret == SQL_SUCCESS || ret == SQL_SUCCESS_WITH_INFO) 
+		if (ret == SQL_SUCCESS || ret == SQL_SUCCESS_WITH_INFO)
 		{
 			cout << "查询成绩信息结果如下：" << endl;
 			SQLCHAR str1[50], str2[50], str3[50];//用来存放从数据库获取的列信息，你有几列就定义几个变量
