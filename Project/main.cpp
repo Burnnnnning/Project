@@ -235,10 +235,10 @@ void DeleteOp(int choiceTable)
 
 		ret = SQLExecDirectW(hstmt, (SQLWCHAR*)wsql.c_str(), SQL_NTS);
 		if (ret == SQL_SUCCESS || ret == SQL_SUCCESS_WITH_INFO) {
-			cout << "学生信息删除成功！" << endl;
+			cout << "成绩信息删除成功！" << endl;
 		}
 		else {
-			cout << "学生信息删除失败！" << endl;
+			cout << "成绩信息删除失败！" << endl;
 		}
 		break;
 	}
@@ -342,7 +342,85 @@ void QueryOp(int choiceTable)
 
 void ModifyOp(int choiceTable)
 {
+	QueryOp(choiceTable);
 
+	ret = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt); // 申请句柄 
+	string str1 = "use student"; // 选择数据库student
+	wstring wstr1 = StringToWString(str1);
+	ret = SQLExecDirectW(hstmt, (SQLWCHAR*)wstr1.c_str(), SQL_NTS);
+
+	//  修改SQL语句
+	//  UPDATE table_name
+	//	SET column1 = value1, column2 = value2, ...
+	//	WHERE condition;
+	switch (choiceTable) {
+	case 1:
+	{
+		//string sql = "select * from Student";
+	    //wstring wsql = StringToWString(sql);
+		//ret = SQLExecDirectW(hstmt, (SQLWCHAR*)wsql.c_str(), SQL_NTS);
+
+		string condition, Sno, Sname, Sage, Sdept;
+		cout << "请输入要修改的学生学号" << endl;
+        cin >> condition;
+		cout << "请输入修改后的内容，依次输入学号、姓名、年龄、所在系" << endl;
+		cin >> Sno >> Sname >> Sage >> Sdept;
+		string sql2 = "update Student set [sno-学号]='" + Sno + "',[sname-姓名]='" + Sname + "',[sage-年龄]=" + Sage + ",[sdept-所在系]='" + Sdept + "' where [sno-学号]='" + condition + "'";
+		wstring wsql2 = StringToWString(sql2);
+
+		ret = SQLExecDirectW(hstmt, (SQLWCHAR*)wsql2.c_str(), SQL_NTS);
+		if (ret == SQL_SUCCESS || ret == SQL_SUCCESS_WITH_INFO) {
+			cout << "修改成功！" << endl;
+		}
+		else {
+			cout << "修改失败！" << endl;
+		}
+		break;
+	}
+	case 2:
+	{
+		string condition, Cno, Cname, Cbefore;
+		cout << "请输入要修改的课程号" << endl;
+		cin >> condition;
+		cout << "请输入修改后的内容，依次输入课程号，课程名，先行课" << endl;
+		cin >> Cno >> Cname >> Cbefore;
+		string sql2 = "update Course set [cno-课程号]='" + Cno + "',[cname-课程名]='" + Cname + "',[cbefore-先行课]='" + Cbefore + "' where [cno-课程号]='" + condition + "'";
+		wstring wsql2 = StringToWString(sql2);
+
+		ret = SQLExecDirectW(hstmt, (SQLWCHAR*)wsql2.c_str(), SQL_NTS);
+		if (ret == SQL_SUCCESS || ret == SQL_SUCCESS_WITH_INFO) {
+			cout << "修改成功！" << endl;
+		}
+		else {
+			cout << "修改失败！" << endl;
+		}
+		break;
+	}
+	case 3:
+	{
+		string conditionSno, conditionCno, Sno, Cno, grade;
+		cout << "请输入要修改的学生学号和课程号" << endl;
+		cin >> conditionSno >> conditionCno;
+		cout << "请输入修改后的内容，依次输入学号，课程号，成绩" << endl;
+		cin >> Sno >> Cno >> grade;
+		string sql2 = "update SC set [sno-学号]='" + Sno + "',[cno-课程号]='" + Cno + "',[grade-成绩]='" + grade + "' where [sno-学号]='" + conditionSno + "' and [cno-课程号]='" + conditionCno + "'";
+		wstring wsql2 = StringToWString(sql2);
+
+		ret = SQLExecDirectW(hstmt, (SQLWCHAR*)wsql2.c_str(), SQL_NTS);
+		if (ret == SQL_SUCCESS || ret == SQL_SUCCESS_WITH_INFO) {
+			cout << "修改成功！" << endl;
+		}
+		else {
+			cout << "修改失败！" << endl;
+		}
+		break;
+	}
+	default:
+		cout << "无效的表选择！" << endl;
+		break;
+	}
+
+	FreeHandle(); // 释放资源
 }
 
 void DisplayMenu()
@@ -353,9 +431,9 @@ void DisplayMenu()
 		cout << "=====学习信息数据库管理系统=====" << endl;
 		cout << "选择要操作的数据表" << endl;
 		cout << "0.退出系统" << endl;
-		cout << "1.Student表" << endl;
-		cout << "2.Course表" << endl;
-		cout << "3.sc表" << endl;
+		cout << "1.学生信息-Student表" << endl;
+		cout << "2.课程信息-Course表" << endl;
+		cout << "3.成绩信息-sc表" << endl;
 		cout << "请输入你的选择：";
 		cin >> choiceTable;
 		if (choiceTable == 0)	break;
