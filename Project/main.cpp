@@ -181,7 +181,73 @@ void InsertOp(int choiceTable)
 
 void DeleteOp(int choiceTable)
 {
+	ret = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt); // 申请句柄 
+	string str1 = "use student";
+    wstring wstr1 = StringToWString(str1);
+	ret = SQLExecDirectW(hstmt, (SQLWCHAR*)wstr1.c_str(), SQL_NTS);
 
+    switch (choiceTable) {
+	case 1:
+	{
+		string sql = "delete from Student where [sno-学号]=";
+		string Sno;
+		cout << "请输入要删除的学生学号" << endl;
+        cin >> Sno;
+		sql = sql + "'" + Sno + "'";
+		wstring wsql = StringToWString(sql);
+
+		ret = SQLExecDirectW(hstmt, (SQLWCHAR*)wsql.c_str(), SQL_NTS);
+		if (ret == SQL_SUCCESS || ret == SQL_SUCCESS_WITH_INFO) {
+            cout << "学生信息删除成功！" << endl;
+		}
+		else {
+			cout << "学生信息删除失败！" << endl;
+		}
+		break;
+	}
+	case 2:
+	{
+		string sql = "delete from Course where [cno-课程号]=";
+		string Cno;
+		cout << "请输入要删除的课程号" << endl;
+		cin >> Cno;
+		sql = sql + "'" + Cno + "'";
+		wstring wsql = StringToWString(sql);
+
+		ret = SQLExecDirectW(hstmt, (SQLWCHAR*)wsql.c_str(), SQL_NTS);
+		if (ret == SQL_SUCCESS || ret == SQL_SUCCESS_WITH_INFO) {
+			cout << "课程信息删除成功！" << endl;
+		}
+		else {
+			cout << "课程信息删除失败！" << endl;
+		}
+		break;
+	}
+	case 3:
+	{
+		string sql = "delete from sc where ";
+		string Sno, Cno;
+		cout << "请输入要删除的学生学号和课程号" << endl;
+		cin >> Sno >> Cno;
+		sql = sql + "[sno-学号]='" + Sno + "' and " + "[cno-课程号]='" + Cno + "'";
+		cout << sql << endl;
+		wstring wsql = StringToWString(sql);
+
+		ret = SQLExecDirectW(hstmt, (SQLWCHAR*)wsql.c_str(), SQL_NTS);
+		if (ret == SQL_SUCCESS || ret == SQL_SUCCESS_WITH_INFO) {
+			cout << "学生信息删除成功！" << endl;
+		}
+		else {
+			cout << "学生信息删除失败！" << endl;
+		}
+		break;
+	}
+	default:
+		cout << "无效的表选择！" << endl;
+		break;
+	}
+
+	FreeHandle(); // 释放资源  
 }
 
 void QueryOp(int choiceTable)
@@ -200,7 +266,7 @@ void QueryOp(int choiceTable)
 
 		if (ret == SQL_SUCCESS || ret == SQL_SUCCESS_WITH_INFO)
 		{
-			cout << "查询结果如下：" << endl;
+			cout << "查询学生信息结果如下：" << endl;
 			SQLCHAR str1[50], str2[50], str3[50], str4[50];//用来存放从数据库获取的列信息，你有几列就定义几个变量
 			SQLLEN len_str1, len_str2, len_str3, len_str4;//字符串对应长度，你有几列就定义几个变量
 			cout << "学号" << " " << "姓名" << " " << "年龄" << " " << "所在系" << endl;
@@ -226,7 +292,7 @@ void QueryOp(int choiceTable)
 
 		if (ret == SQL_SUCCESS || ret == SQL_SUCCESS_WITH_INFO) 
 		{
-			cout << "查询结果如下：" << endl;
+			cout << "查询课程信息结果如下：" << endl;
 			SQLCHAR str1[50], str2[50], str3[50];
 			SQLLEN len_str1, len_str2, len_str3;
 			cout << "课程号" << " " << "课程名" << " " << "先行课" << endl;
@@ -251,7 +317,7 @@ void QueryOp(int choiceTable)
 
 		if (ret == SQL_SUCCESS || ret == SQL_SUCCESS_WITH_INFO) 
 		{
-			cout << "查询结果如下：" << endl;
+			cout << "查询成绩信息结果如下：" << endl;
 			SQLCHAR str1[50], str2[50], str3[50];//用来存放从数据库获取的列信息，你有几列就定义几个变量
 			SQLLEN len_str1, len_str2, len_str3;//字符串对应长度，你有几列就定义几个变量
 			cout << "学号" << " " << "课程号" << " " << "成绩" << endl;
