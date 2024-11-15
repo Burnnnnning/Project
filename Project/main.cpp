@@ -61,7 +61,8 @@ void DeBug(SQLRETURN ret)
 	}
 }
 
-void Connect() // 数据库连接函数
+// 数据库连接函数
+void Connect() 
 {
 	// 申请环境
 	ret = SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &henv);
@@ -94,7 +95,8 @@ void Connect() // 数据库连接函数
 	wstring wuser = StringToWString("sa");
 	wstring wpassword = StringToWString("123456");
 
-	ret = SQLConnectW(hdbc, (SQLWCHAR*)wserver.c_str(), SQL_NTS, (SQLWCHAR*)wuser.c_str(), SQL_NTS, (SQLWCHAR*)wpassword.c_str(), SQL_NTS);
+	ret = SQLConnectW(hdbc, (SQLWCHAR*)wserver.c_str(), SQL_NTS, (SQLWCHAR*)wuser.c_str(),
+		SQL_NTS, (SQLWCHAR*)wpassword.c_str(), SQL_NTS);
 	if (ret == SQL_SUCCESS || ret == SQL_SUCCESS_WITH_INFO)
 	{
 		cout << "数据库连接成功!" << endl;
@@ -179,8 +181,98 @@ void InsertOp(int choiceTable)
 	FreeHandle(); // 释放资源  
 }
 
+void QueryOp(int choiceTable)
+{
+	ret = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt); // 申请句柄 
+	string str1 = "use student"; // 选择数据库student
+	wstring wstr1 = StringToWString(str1);
+	ret = SQLExecDirectW(hstmt, (SQLWCHAR*)wstr1.c_str(), SQL_NTS);
+
+	switch (choiceTable) {
+	case 1:
+	{
+		string sql = "select * from Student";
+		wstring wsql = StringToWString(sql);
+		ret = SQLExecDirectW(hstmt, (SQLWCHAR*)wsql.c_str(), SQL_NTS);
+
+		if (ret == SQL_SUCCESS || ret == SQL_SUCCESS_WITH_INFO)
+		{
+			cout << "查询学生信息结果如下：" << endl;
+			SQLCHAR str1[50], str2[50], str3[50], str4[50];//用来存放从数据库获取的列信息，你有几列就定义几个变量
+			SQLLEN len_str1, len_str2, len_str3, len_str4;//字符串对应长度，你有几列就定义几个变量
+			cout << "学号" << " " << "姓名" << " " << "年龄" << " " << "所在系" << endl;
+			while (SQLFetch(hstmt) != SQL_NO_DATA)
+			{
+				SQLGetData(hstmt, 1, SQL_C_CHAR, str1, 50, &len_str1);//从数据库获取数据，你的列有多少，就写多少，从1开始
+				SQLGetData(hstmt, 2, SQL_C_CHAR, str2, 50, &len_str2);
+				SQLGetData(hstmt, 3, SQL_C_CHAR, str3, 50, &len_str3);
+				SQLGetData(hstmt, 4, SQL_C_CHAR, str4, 50, &len_str4);
+				cout << string((char*)str1, len_str1) << "  " << string((char*)str2, len_str2)
+					<< "  " << string((char*)str3, len_str3) << "  " << string((char*)str4, len_str4) << endl;
+			}
+		}
+		break;
+	}
+	case 2:
+	{
+		// 查询表 Course
+		string sql = "select * from Course";
+		wstring wsql = StringToWString(sql);
+		ret = SQLExecDirectW(hstmt, (SQLWCHAR*)wsql.c_str(), SQL_NTS);
+
+		if (ret == SQL_SUCCESS || ret == SQL_SUCCESS_WITH_INFO)
+		{
+			cout << "查询课程信息结果如下：" << endl;
+			SQLCHAR str1[50], str2[50], str3[50];
+			SQLLEN len_str1, len_str2, len_str3;
+			cout << "课程号" << " " << "课程名" << " " << "先行课" << endl;
+			while (SQLFetch(hstmt) != SQL_NO_DATA)
+			{
+				SQLGetData(hstmt, 1, SQL_C_CHAR, str1, 50, &len_str1);//从数据库获取数据，你的列有多少，就写多少，从1开始
+				SQLGetData(hstmt, 2, SQL_C_CHAR, str2, 50, &len_str2);
+				SQLGetData(hstmt, 3, SQL_C_CHAR, str3, 50, &len_str3);
+				cout << string((char*)str1, len_str1) << "   " << string((char*)str2, len_str2)
+					<< "   " << string((char*)str3, len_str3) << endl;
+			}
+		}
+		break;
+	}
+	case 3:
+	{
+		// 查询表 sc
+		string sql = "select * from sc";
+		wstring wsql = StringToWString(sql);
+		ret = SQLExecDirectW(hstmt, (SQLWCHAR*)wsql.c_str(), SQL_NTS);
+
+		if (ret == SQL_SUCCESS || ret == SQL_SUCCESS_WITH_INFO)
+		{
+			cout << "查询成绩信息结果如下：" << endl;
+			SQLCHAR str1[50], str2[50], str3[50];//用来存放从数据库获取的列信息，你有几列就定义几个变量
+			SQLLEN len_str1, len_str2, len_str3;//字符串对应长度，你有几列就定义几个变量
+			cout << "学号" << " " << "课程号" << " " << "成绩" << endl;
+			while (SQLFetch(hstmt) != SQL_NO_DATA)
+			{
+				SQLGetData(hstmt, 1, SQL_C_CHAR, str1, 50, &len_str1);//从数据库获取数据，你的列有多少，就写多少，从1开始
+				SQLGetData(hstmt, 2, SQL_C_CHAR, str2, 50, &len_str2);
+				SQLGetData(hstmt, 3, SQL_C_CHAR, str3, 50, &len_str3);
+				cout << string((char*)str1, len_str1) << "   " << string((char*)str2, len_str2)
+					<< "   " << string((char*)str3, len_str3) << endl;
+			}
+		}
+		break;
+	}
+	default:
+		cout << "无效的表选择！" << endl;
+		break;
+	}
+
+	FreeHandle(); // 释放资源
+}
+
 void DeleteOp(int choiceTable)
 {
+	QueryOp(choiceTable);
+
 	ret = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt); // 申请句柄 
 	string str1 = "use student";
 	wstring wstr1 = StringToWString(str1);
@@ -248,96 +340,6 @@ void DeleteOp(int choiceTable)
 	}
 
 	FreeHandle(); // 释放资源  
-}
-
-void QueryOp(int choiceTable)
-{
-	ret = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt); // 申请句柄 
-	string str1 = "use student"; // 选择数据库student
-	wstring wstr1 = StringToWString(str1);
-	ret = SQLExecDirectW(hstmt, (SQLWCHAR*)wstr1.c_str(), SQL_NTS);
-
-	switch (choiceTable) {
-	case 1:
-	{
-		string sql = "select * from Student";
-		wstring wsql = StringToWString(sql);
-		ret = SQLExecDirectW(hstmt, (SQLWCHAR*)wsql.c_str(), SQL_NTS);
-
-		if (ret == SQL_SUCCESS || ret == SQL_SUCCESS_WITH_INFO)
-		{
-			cout << "查询学生信息结果如下：" << endl;
-			SQLCHAR str1[50], str2[50], str3[50], str4[50];//用来存放从数据库获取的列信息，你有几列就定义几个变量
-			SQLLEN len_str1, len_str2, len_str3, len_str4;//字符串对应长度，你有几列就定义几个变量
-			cout << "学号" << " " << "姓名" << " " << "年龄" << " " << "所在系" << endl;
-			while (SQLFetch(hstmt) != SQL_NO_DATA)
-			{
-				SQLGetData(hstmt, 1, SQL_C_CHAR, str1, 50, &len_str1);//从数据库获取数据，你的列有多少，就写多少，从1开始
-				SQLGetData(hstmt, 2, SQL_C_CHAR, str2, 50, &len_str2);
-				SQLGetData(hstmt, 3, SQL_C_CHAR, str3, 50, &len_str3);
-				SQLGetData(hstmt, 4, SQL_C_CHAR, str4, 50, &len_str4);
-				cout << string((char*)str1, len_str1) << "  " << string((char*)str2, len_str2)
-					<< "  " << string((char*)str3, len_str3) << "  " << string((char*)str4, len_str4) << endl;
-			}
-
-		}
-		break;
-	}
-	case 2:
-	{
-		// 查询表 Course
-		string sql = "select * from Course";
-		wstring wsql = StringToWString(sql);
-		ret = SQLExecDirectW(hstmt, (SQLWCHAR*)wsql.c_str(), SQL_NTS);
-
-		if (ret == SQL_SUCCESS || ret == SQL_SUCCESS_WITH_INFO)
-		{
-			cout << "查询课程信息结果如下：" << endl;
-			SQLCHAR str1[50], str2[50], str3[50];
-			SQLLEN len_str1, len_str2, len_str3;
-			cout << "课程号" << " " << "课程名" << " " << "先行课" << endl;
-			while (SQLFetch(hstmt) != SQL_NO_DATA)
-			{
-				SQLGetData(hstmt, 1, SQL_C_CHAR, str1, 50, &len_str1);//从数据库获取数据，你的列有多少，就写多少，从1开始
-				SQLGetData(hstmt, 2, SQL_C_CHAR, str2, 50, &len_str2);
-				SQLGetData(hstmt, 3, SQL_C_CHAR, str3, 50, &len_str3);
-				cout << string((char*)str1, len_str1) << "   " << string((char*)str2, len_str2)
-					<< "   " << string((char*)str3, len_str3) << endl;
-			}
-
-		}
-		break;
-	}
-	case 3:
-	{
-		// 查询表 sc
-		string sql = "select * from sc";
-		wstring wsql = StringToWString(sql);
-		ret = SQLExecDirectW(hstmt, (SQLWCHAR*)wsql.c_str(), SQL_NTS);
-
-		if (ret == SQL_SUCCESS || ret == SQL_SUCCESS_WITH_INFO)
-		{
-			cout << "查询成绩信息结果如下：" << endl;
-			SQLCHAR str1[50], str2[50], str3[50];//用来存放从数据库获取的列信息，你有几列就定义几个变量
-			SQLLEN len_str1, len_str2, len_str3;//字符串对应长度，你有几列就定义几个变量
-			cout << "学号" << " " << "课程号" << " " << "成绩" << endl;
-			while (SQLFetch(hstmt) != SQL_NO_DATA)
-			{
-				SQLGetData(hstmt, 1, SQL_C_CHAR, str1, 50, &len_str1);//从数据库获取数据，你的列有多少，就写多少，从1开始
-				SQLGetData(hstmt, 2, SQL_C_CHAR, str2, 50, &len_str2);
-				SQLGetData(hstmt, 3, SQL_C_CHAR, str3, 50, &len_str3);
-				cout << string((char*)str1, len_str1) << "   " << string((char*)str2, len_str2)
-					<< "   " << string((char*)str3, len_str3) << endl;
-			}
-		}
-		break;
-	}
-	default:
-		cout << "无效的表选择！" << endl;
-		break;
-	}
-
-	FreeHandle(); // 释放资源
 }
 
 void ModifyOp(int choiceTable)
